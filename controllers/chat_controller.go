@@ -18,7 +18,7 @@ type ChatController struct {
 // @Summary 测试AI服务
 // @Description 测试AI服务是否正常工作
 // @Produce json
-// @Param msg query string true "测试消息"
+// @Param msg query string false "测试消息"
 // @Success 200 {string} string "成功"
 // @Failure 500 {object} string "内部错误"
 // @Router /chat/test [get]

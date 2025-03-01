@@ -101,7 +101,6 @@ paths:
       - description: 测试消息
         in: query
         name: msg
-        required: true
         type: string
       produces:
       - application/json

@@ -111,8 +111,7 @@ const docTemplate = `{
                         "type": "string",
                         "description": "测试消息",
                         "name": "msg",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     }
                 ],
                 "responses": {
