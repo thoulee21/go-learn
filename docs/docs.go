@@ -15,56 +15,32 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/tasks": {
-            "get": {
-                "description": "获取所有任务",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "获取所有任务",
-                "responses": {
-                    "200": {
-                        "description": "成功",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Task"
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "内部错误",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
+        "/chat": {
             "post": {
-                "description": "创建任务",
+                "description": "发送消息到AI并获取回复",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "创建任务",
+                "summary": "发送聊天消息",
                 "parameters": [
                     {
-                        "description": "任务",
-                        "name": "task",
+                        "description": "聊天请求",
+                        "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "$ref": "#/definitions/models.ChatRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
+                    "200": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "$ref": "#/definitions/models.ChatResponse"
                         }
                     },
                     "400": {
@@ -82,18 +58,18 @@ const docTemplate = `{
                 }
             }
         },
-        "/tasks/{id}": {
+        "/chat/history/{session_id}": {
             "get": {
-                "description": "获取任务",
+                "description": "获取特定会话的聊天历史",
                 "produces": [
                     "application/json"
                 ],
-                "summary": "获取任务",
+                "summary": "获取聊天历史",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "任务ID",
-                        "name": "id",
+                        "type": "string",
+                        "description": "会话ID",
+                        "name": "session_id",
                         "in": "path",
                         "required": true
                     }
@@ -102,107 +78,14 @@ const docTemplate = `{
                     "200": {
                         "description": "成功",
                         "schema": {
-                            "$ref": "#/definitions/models.Task"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.ChatMessage"
+                            }
                         }
                     },
                     "400": {
                         "description": "请求错误",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "任务不存在",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "更新任务",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "更新任务",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "任务ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "任务",
-                        "name": "task",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.Task"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "成功",
-                        "schema": {
-                            "$ref": "#/definitions/models.Task"
-                        }
-                    },
-                    "400": {
-                        "description": "请求错误",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "任务不存在",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "内部错误",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "删除任务",
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "删除任务",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "任务ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "204": {
-                        "description": "成功",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "请求错误",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "任务不存在",
                         "schema": {
                             "type": "string"
                         }
@@ -218,33 +101,60 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.Task": {
+        "models.ChatMessage": {
             "type": "object",
             "required": [
-                "title"
+                "content",
+                "role"
             ],
             "properties": {
-                "created_at": {
+                "content": {
                     "type": "string"
                 },
-                "description": {
+                "created_at": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "status": {
+                "role": {
+                    "description": "user, assistant, system",
                     "type": "string",
                     "enum": [
-                        "pending",
-                        "completed",
-                        "canceled"
+                        "user",
+                        "assistant",
+                        "system"
                     ]
                 },
-                "title": {
+                "session_id": {
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ChatRequest": {
+            "type": "object",
+            "required": [
+                "message"
+            ],
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ChatResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "session_id": {
                     "type": "string"
                 }
             }

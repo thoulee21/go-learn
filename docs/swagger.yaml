@@ -1,31 +1,83 @@
 definitions:
-  models.Task:
+  models.ChatMessage:
     properties:
-      created_at:
+      content:
         type: string
-      description:
+      created_at:
         type: string
       id:
         type: integer
-      status:
+      role:
+        description: user, assistant, system
         enum:
-        - pending
-        - completed
-        - canceled
+        - user
+        - assistant
+        - system
         type: string
-      title:
+      session_id:
         type: string
       updated_at:
         type: string
     required:
-    - title
+    - content
+    - role
+    type: object
+  models.ChatRequest:
+    properties:
+      message:
+        type: string
+      session_id:
+        type: string
+    required:
+    - message
+    type: object
+  models.ChatResponse:
+    properties:
+      message:
+        type: string
+      session_id:
+        type: string
     type: object
 info:
   contact: {}
 paths:
-  /tasks:
+  /chat:
+    post:
+      consumes:
+      - application/json
+      description: 发送消息到AI并获取回复
+      parameters:
+      - description: 聊天请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChatRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.ChatResponse'
+        "400":
+          description: 请求错误
+          schema:
+            type: string
+        "500":
+          description: 内部错误
+          schema:
+            type: string
+      summary: 发送聊天消息
+  /chat/history/{session_id}:
     get:
-      description: 获取所有任务
+      description: 获取特定会话的聊天历史
+      parameters:
+      - description: 会话ID
+        in: path
+        name: session_id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -33,31 +85,8 @@ paths:
           description: 成功
           schema:
             items:
-              $ref: '#/definitions/models.Task'
+              $ref: '#/definitions/models.ChatMessage'
             type: array
-        "500":
-          description: 内部错误
-          schema:
-            type: string
-      summary: 获取所有任务
-    post:
-      consumes:
-      - application/json
-      description: 创建任务
-      parameters:
-      - description: 任务
-        in: body
-        name: task
-        required: true
-        schema:
-          $ref: '#/definitions/models.Task'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: 成功
-          schema:
-            $ref: '#/definitions/models.Task'
         "400":
           description: 请求错误
           schema:
@@ -66,94 +95,5 @@ paths:
           description: 内部错误
           schema:
             type: string
-      summary: 创建任务
-  /tasks/{id}:
-    delete:
-      description: 删除任务
-      parameters:
-      - description: 任务ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "204":
-          description: 成功
-          schema:
-            type: string
-        "400":
-          description: 请求错误
-          schema:
-            type: string
-        "404":
-          description: 任务不存在
-          schema:
-            type: string
-        "500":
-          description: 内部错误
-          schema:
-            type: string
-      summary: 删除任务
-    get:
-      description: 获取任务
-      parameters:
-      - description: 任务ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功
-          schema:
-            $ref: '#/definitions/models.Task'
-        "400":
-          description: 请求错误
-          schema:
-            type: string
-        "404":
-          description: 任务不存在
-          schema:
-            type: string
-      summary: 获取任务
-    put:
-      consumes:
-      - application/json
-      description: 更新任务
-      parameters:
-      - description: 任务ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: 任务
-        in: body
-        name: task
-        required: true
-        schema:
-          $ref: '#/definitions/models.Task'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 成功
-          schema:
-            $ref: '#/definitions/models.Task'
-        "400":
-          description: 请求错误
-          schema:
-            type: string
-        "404":
-          description: 任务不存在
-          schema:
-            type: string
-        "500":
-          description: 内部错误
-          schema:
-            type: string
-      summary: 更新任务
+      summary: 获取聊天历史
 swagger: "2.0"
