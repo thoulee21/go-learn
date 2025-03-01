@@ -1,38 +1,36 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"math/rand"
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/thoulee21/go-learn/controllers"
+	_ "github.com/thoulee21/go-learn/docs"
+	"github.com/thoulee21/go-learn/models"
+	"github.com/thoulee21/go-learn/routes"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-var guess = rand.Intn(10) + 1
-var input int
+var db *gorm.DB
 
-func doGuess() {
-	fmt.Printf("Guess a number between 1 and 10: ")
-	_, err := fmt.Scanln(&input)
+func init() {
+	var err error
+	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
 	if err != nil {
-		fmt.Println("Invalid input")
-		return
+		panic("failed to connect database")
 	}
 
-	if input == guess {
-		fmt.Println("You guessed correctly!")
-	} else {
-		fmt.Printf("You guessed wrong! ")
-
-		if input > guess {
-			fmt.Println("Guessed greater")
-		} else {
-			fmt.Println("Guessed smaller")
-		}
-
-		doGuess()
-	}
+	db.AutoMigrate(&models.Task{})
 }
 
 func main() {
-	doGuess()
-	log.Println("Thanks for playing!")
+	r := gin.Default()
+
+	taskController := &controllers.TaskController{DB: db}
+
+	routes.SetupTaskRoutes(r, taskController)
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	r.Run(":80")
 }

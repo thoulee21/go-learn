@@ -1,0 +1,159 @@
+definitions:
+  models.Task:
+    properties:
+      created_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      status:
+        enum:
+        - pending
+        - completed
+        - canceled
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - title
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/tasks:
+    get:
+      description: 获取所有任务
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            items:
+              $ref: '#/definitions/models.Task'
+            type: array
+        "500":
+          description: 内部错误
+          schema:
+            type: string
+      summary: 获取所有任务
+    post:
+      consumes:
+      - application/json
+      description: 创建任务
+      parameters:
+      - description: 任务
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.Task'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: 请求错误
+          schema:
+            type: string
+        "500":
+          description: 内部错误
+          schema:
+            type: string
+      summary: 创建任务
+  /api/v1/tasks/{id}:
+    delete:
+      description: 删除任务
+      parameters:
+      - description: 任务ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            type: string
+        "404":
+          description: 任务不存在
+          schema:
+            type: string
+        "500":
+          description: 内部错误
+          schema:
+            type: string
+      summary: 删除任务
+    get:
+      description: 获取任务
+      parameters:
+      - description: 任务ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: 请求错误
+          schema:
+            type: string
+        "404":
+          description: 任务不存在
+          schema:
+            type: string
+      summary: 获取任务
+    put:
+      consumes:
+      - application/json
+      description: 更新任务
+      parameters:
+      - description: 任务ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 任务
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/models.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/models.Task'
+        "400":
+          description: 请求错误
+          schema:
+            type: string
+        "404":
+          description: 任务不存在
+          schema:
+            type: string
+        "500":
+          description: 内部错误
+          schema:
+            type: string
+      summary: 更新任务
+swagger: "2.0"
