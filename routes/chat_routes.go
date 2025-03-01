@@ -10,5 +10,6 @@ func SetupChatRoutes(r *gin.Engine, cc *controllers.ChatController) {
     {
         chatGroup.POST("", cc.Chat)
         chatGroup.GET("/history/:session_id", cc.GetChatHistory)
+        chatGroup.GET("/test", cc.Test)
     }
 }

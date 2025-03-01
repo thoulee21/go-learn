@@ -96,4 +96,25 @@ paths:
           schema:
             type: string
       summary: 获取聊天历史
+  /chat/test:
+    get:
+      description: 测试AI服务是否正常工作
+      parameters:
+      - description: 测试消息
+        in: query
+        name: msg
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "500":
+          description: 内部错误
+          schema:
+            type: string
+      summary: 测试AI服务
 swagger: "2.0"
