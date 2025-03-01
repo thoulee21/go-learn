@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -27,8 +28,18 @@ func init() {
 		log.Println("Loading .env file")
 	}
 
+	// 连接数据库
+	// 区分开发数据库和生产数据库
+	ginMode := os.Getenv("GIN_MODE")
+	dbName := "test.db"
+
+	if ginMode == "release" {
+		gin.SetMode(gin.ReleaseMode)
+		dbName = "release.db"
+	}
+
 	var err error
-	db, err = gorm.Open(sqlite.Open("test.db"), &gorm.Config{})
+	db, err = gorm.Open(sqlite.Open(dbName), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
@@ -50,5 +61,8 @@ func main() {
 	// Swagger 文档
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	r.Run(":80")
+	// 默认在8080端口启动服务
+	if err := r.Run(); err != nil {
+		log.Fatalf("Could not start server: %s\n", err)
+	}
 }
