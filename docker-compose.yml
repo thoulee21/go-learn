@@ -1,0 +1,12 @@
+services:
+  api:
+    build: .
+    image: aichatboy
+    ports:
+      # Host:Container
+      - "80:8080"
+    environment:
+      - AZURE_OPENAI_ENDPOINT=your-endpoint
+      - AZURE_OPENAI_API_KEY=your-api-key
+      - AZURE_OPENAI_DEPLOYMENT_NAME=your-deployment-name
+      - GIN_MODE=release
