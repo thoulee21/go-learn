@@ -160,9 +160,6 @@ const docTemplate = `{
                 },
                 "session_id": {
                     "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
                 }
             }
         },

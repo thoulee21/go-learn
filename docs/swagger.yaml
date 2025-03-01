@@ -16,8 +16,6 @@ definitions:
         type: string
       session_id:
         type: string
-      updated_at:
-        type: string
     required:
     - content
     - role
