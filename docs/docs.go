@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/tasks": {
+        "/tasks": {
             "get": {
                 "description": "获取所有任务",
                 "produces": [
@@ -82,7 +82,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/v1/tasks/{id}": {
+        "/tasks/{id}": {
             "get": {
                 "description": "获取任务",
                 "produces": [

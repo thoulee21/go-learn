@@ -18,7 +18,7 @@ type TaskController struct {
 //	@Produce		json
 //	@Success		200	{array}		models.Task	"成功"
 //	@Failure		500	{object}	string		"内部错误"
-//	@Router			/api/v1/tasks [get]
+//	@Router			/tasks [get]
 func (tc *TaskController) GetTasks(c *gin.Context) {
 	var tasks []models.Task
 	if err := tc.DB.Find(&tasks).Error; err != nil {
@@ -36,7 +36,7 @@ func (tc *TaskController) GetTasks(c *gin.Context) {
 //	@Success		201		{object}	models.Task	"成功"
 //	@Failure		400		{object}	string		"请求错误"
 //	@Failure		500		{object}	string		"内部错误"
-//	@Router			/api/v1/tasks [post]
+//	@Router			/tasks [post]
 func (tc *TaskController) CreateTask(c *gin.Context) {
 	var task models.Task
 	if err := c.ShouldBindJSON(&task); err != nil {
@@ -58,7 +58,7 @@ func (tc *TaskController) CreateTask(c *gin.Context) {
 //	@Success		200	{object}	models.Task	"成功"
 //	@Failure		400	{object}	string		"请求错误"
 //	@Failure		404	{object}	string		"任务不存在"
-//	@Router			/api/v1/tasks/{id} [get]
+//	@Router			/tasks/{id} [get]
 func (tc *TaskController) GetTask(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -84,7 +84,7 @@ func (tc *TaskController) GetTask(c *gin.Context) {
 //	@Failure		400		{object}	string		"请求错误"
 //	@Failure		404		{object}	string		"任务不存在"
 //	@Failure		500		{object}	string		"内部错误"
-//	@Router			/api/v1/tasks/{id} [put]
+//	@Router			/tasks/{id} [put]
 func (tc *TaskController) UpdateTask(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -118,7 +118,7 @@ func (tc *TaskController) UpdateTask(c *gin.Context) {
 //	@Failure		400	{object}	string	"请求错误"
 //	@Failure		404	{object}	string	"任务不存在"
 //	@Failure		500	{object}	string	"内部错误"
-//	@Router			/api/v1/tasks/{id} [delete]
+//	@Router			/tasks/{id} [delete]
 func (tc *TaskController) DeleteTask(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {

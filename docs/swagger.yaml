@@ -23,7 +23,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /api/v1/tasks:
+  /tasks:
     get:
       description: 获取所有任务
       produces:
@@ -67,7 +67,7 @@ paths:
           schema:
             type: string
       summary: 创建任务
-  /api/v1/tasks/{id}:
+  /tasks/{id}:
     delete:
       description: 删除任务
       parameters:

@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/api/v1/tasks": {
+        "/tasks": {
             "get": {
                 "description": "获取所有任务",
                 "produces": [
@@ -71,7 +71,7 @@
                 }
             }
         },
-        "/api/v1/tasks/{id}": {
+        "/tasks/{id}": {
             "get": {
                 "description": "获取任务",
                 "produces": [
