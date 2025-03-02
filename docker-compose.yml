@@ -1,6 +1,8 @@
 services:
   api:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     image: aichatbot
     ports:
       # Host:Container
@@ -31,7 +33,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - dbdata:/var/lib/mysql
+      - mysqldata:/var/lib/mysql
 
 volumes:
-  dbdata:
+  mysqldata:

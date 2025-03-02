@@ -6,7 +6,7 @@ RUN go env -w GOPROXY=https://goproxy.cn,direct
 RUN go build -o aichatbot
 
 
-FROM ubuntu
+FROM alpine
 WORKDIR /srv/go-app
 COPY --from=builder /srv/go-app/aichatbot .
 

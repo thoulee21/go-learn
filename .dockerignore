@@ -1,2 +1,7 @@
+*.log
+tmp
 .git
 .gitignore
+.env*
+*.db
+db
