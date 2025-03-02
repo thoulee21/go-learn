@@ -1,7 +1,7 @@
 services:
   api:
     build: .
-    image: aichatboy
+    image: aichatbot
     ports:
       # Host:Container
       - "80:8080"
@@ -10,3 +10,4 @@ services:
       - AZURE_OPENAI_API_KEY=your-api-key
       - AZURE_OPENAI_DEPLOYMENT_NAME=your-deployment-name
       - GIN_MODE=release
+    restart: on-failure
