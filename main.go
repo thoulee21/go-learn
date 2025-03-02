@@ -14,7 +14,7 @@ import (
 	"github.com/thoulee21/go-learn/models"
 	"github.com/thoulee21/go-learn/routes"
 	"github.com/thoulee21/go-learn/services"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
@@ -29,22 +29,27 @@ func init() {
 	}
 
 	// 连接数据库
-	// 区分开发数据库和生产数据库
-	ginMode := os.Getenv("GIN_MODE")
-	dbName := "test.db"
+	host := os.Getenv("MYSQL_HOST")
+	port := os.Getenv("MYSQL_PORT")
+	user := os.Getenv("MYSQL_USER")
+	password := os.Getenv("MYSQL_PASSWORD")
+	const database = "aichatbot"
 
-	if ginMode == "release" {
-		gin.SetMode(gin.ReleaseMode)
-		dbName = "release.db"
-	}
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		user, password, host, port, database,
+	)
 
 	var err error
-	db, err = gorm.Open(sqlite.Open(dbName), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 
-	db.AutoMigrate(&models.ChatMessage{})
+	dbErr := db.AutoMigrate(&models.ChatMessage{})
+	if dbErr != nil {
+		panic("failed to migrate database")
+	}
 }
 
 func main() {

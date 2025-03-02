@@ -10,4 +10,23 @@ services:
       - AZURE_OPENAI_API_KEY=your-api-key
       - AZURE_OPENAI_DEPLOYMENT_NAME=your-deployment-name
       - GIN_MODE=release
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+      - MYSQL_USER=aichatbot
+      - MYSQL_PASSWORD=aichatbot
     restart: on-failure
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=aichatbot
+      - MYSQL_USER=aichatbot
+      - MYSQL_PASSWORD=aichatbot
+      - MYSQL_HOST=db
+      - MYSQL_PORT=3306
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./db:/var/lib/mysql
