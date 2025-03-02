@@ -88,6 +88,49 @@
                 }
             }
         },
+        "/chat/stream": {
+            "post": {
+                "description": "流式发送消息到AI并获取实时回复",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/event-stream"
+                ],
+                "summary": "流式发送聊天消息",
+                "parameters": [
+                    {
+                        "description": "聊天请求",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.ChatRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "请求错误",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "内部错误",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/chat/test": {
             "get": {
                 "description": "测试AI服务是否正常工作",

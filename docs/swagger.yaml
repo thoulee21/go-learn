@@ -94,6 +94,34 @@ paths:
           schema:
             type: string
       summary: 获取聊天历史
+  /chat/stream:
+    post:
+      consumes:
+      - application/json
+      description: 流式发送消息到AI并获取实时回复
+      parameters:
+      - description: 聊天请求
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.ChatRequest'
+      produces:
+      - text/event-stream
+      responses:
+        "200":
+          description: 成功
+          schema:
+            type: string
+        "400":
+          description: 请求错误
+          schema:
+            type: string
+        "500":
+          description: 内部错误
+          schema:
+            type: string
+      summary: 流式发送聊天消息
   /chat/test:
     get:
       description: 测试AI服务是否正常工作

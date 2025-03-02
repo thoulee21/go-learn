@@ -129,3 +129,87 @@ func (cc *ChatController) GetChatHistory(c *gin.Context) {
 
 	c.JSON(http.StatusOK, messages)
 }
+
+// @Summary 流式发送聊天消息
+// @Description 流式发送消息到AI并获取实时回复
+// @Accept json
+// @Produce text/event-stream
+// @Param request body models.ChatRequest true "聊天请求"
+// @Success 200 {object} string "成功"
+// @Failure 400 {object} string "请求错误"
+// @Failure 500 {object} string "内部错误"
+// @Router /chat/stream [post]
+func (cc *ChatController) StreamChat(c *gin.Context) {
+	var request models.ChatRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 如果没有会话ID，创建一个新的
+	if request.SessionID == "" {
+		request.SessionID = uuid.New().String()
+	}
+
+	// 保存用户消息
+	userMessage := models.ChatMessage{
+		SessionID: request.SessionID,
+		Role:      "user",
+		Content:   request.Message,
+	}
+	if err := cc.DB.Create(&userMessage).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "无法保存消息"})
+		return
+	}
+
+	// 获取历史消息（最多10条）
+	var chatHistory []models.ChatMessage
+	cc.DB.Where("session_id = ?", request.SessionID).Order("created_at desc").Limit(10).Find(&chatHistory)
+
+	// 构造OpenAI消息格式
+	var openAIMessages []services.ChatMessage
+	for i := len(chatHistory) - 1; i >= 0; i-- {
+		openAIMessages = append(openAIMessages, services.ChatMessage{
+			Role:    chatHistory[i].Role,
+			Content: chatHistory[i].Content,
+		})
+	}
+
+	// 设置SSE响应头
+	c.Writer.Header().Set("Content-Type", "text/event-stream")
+	c.Writer.Header().Set("Cache-Control", "no-cache")
+	c.Writer.Header().Set("Connection", "keep-alive")
+	c.Writer.Header().Set("Transfer-Encoding", "chunked")
+
+	// 保存完整响应用于数据库存储
+	fullResponse := ""
+
+	// 创建回调函数处理流式响应
+	callback := func(chunk string) {
+		// 发送数据块
+		c.Writer.Write([]byte("data: " + chunk + "\n\n"))
+		c.Writer.Flush()
+		fullResponse += chunk
+	}
+
+	// 调用AI服务的流式响应方法
+	err := cc.AIService.GenerateStreamResponse(openAIMessages, callback)
+	if err != nil {
+		// 尝试发送错误消息，但此时可能连接已关闭
+		c.Writer.Write([]byte("data: {\"error\": \"" + err.Error() + "\"}\n\n"))
+		c.Writer.Flush()
+		return
+	}
+
+	// 发送结束信号
+	c.Writer.Write([]byte("data: [DONE]\n\n"))
+	c.Writer.Flush()
+
+	// 保存AI回复到数据库
+	aiMessage := models.ChatMessage{
+		SessionID: request.SessionID,
+		Role:      "assistant",
+		Content:   fullResponse,
+	}
+	cc.DB.Create(&aiMessage)
+}

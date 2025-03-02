@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai"
@@ -55,8 +56,7 @@ func NewAIService() (*AIService, error) {
 	}, nil
 }
 
-func (s *AIService) GenerateResponse(messages []ChatMessage) (string, error) {
-	// 将我们的消息格式转换为 Azure SDK 的消息格式
+func (s *AIService) convertToAzureMessages(messages []ChatMessage) ([]azopenai.ChatRequestMessageClassification, error) {
 	azMessages := make([]azopenai.ChatRequestMessageClassification, 0, len(messages))
 
 	for _, msg := range messages {
@@ -74,8 +74,18 @@ func (s *AIService) GenerateResponse(messages []ChatMessage) (string, error) {
 				Content: azopenai.NewChatRequestAssistantMessageContent(msg.Content),
 			})
 		default:
-			return "", fmt.Errorf("unsupported role: %s", msg.Role)
+			return nil, fmt.Errorf("unsupported role: %s", msg.Role)
 		}
+	}
+
+	return azMessages, nil
+}
+
+func (s *AIService) GenerateResponse(messages []ChatMessage) (string, error) {
+	// 将我们的消息格式转换为 Azure SDK 的消息格式
+	azMessages, err := s.convertToAzureMessages(messages)
+	if err != nil {
+		return "", err
 	}
 
 	resp, err := s.client.GetChatCompletions(context.TODO(), azopenai.ChatCompletionsOptions{
@@ -98,4 +108,50 @@ func (s *AIService) GenerateResponse(messages []ChatMessage) (string, error) {
 	}
 
 	return *resp.Choices[0].Message.Content, nil
+}
+
+func (s *AIService) GenerateStreamResponse(messages []ChatMessage, callback func(chunk string)) error {
+	// 将我们的消息格式转换为 Azure SDK 的消息格式
+	azMessages, err := s.convertToAzureMessages(messages)
+	if err != nil {
+		return err
+	}
+
+	// 创建流式请求
+	streamResp, err := s.client.GetChatCompletionsStream(
+		context.TODO(),
+		azopenai.ChatCompletionsStreamOptions{
+			Messages:         azMessages,
+			DeploymentName:   &s.deploymentName,
+			MaxTokens:        &s.maxTokens,
+			Temperature:      &s.temperature,
+			TopP:             &s.topP,
+			FrequencyPenalty: &s.freqPenalty,
+			PresencePenalty:  &s.presencePenalty,
+			Stop:             s.stop,
+		},
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	// 处理流式响应
+	for {
+		resp, err := streamResp.ChatCompletionsStream.Read()
+		if err != nil {
+			// 检查是否是结束的错误
+			if errors.Is(err, io.EOF) {
+				break // 流已结束，正常退出
+			}
+			return err
+		}
+
+		// 检查并处理响应内容
+		if len(resp.Choices) > 0 && resp.Choices[0].Delta != nil && resp.Choices[0].Delta.Content != nil {
+			callback(*resp.Choices[0].Delta.Content)
+		}
+	}
+
+	return nil
 }
