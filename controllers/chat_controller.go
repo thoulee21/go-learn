@@ -25,9 +25,12 @@ type ChatController struct {
 func (cc *ChatController) Test(c *gin.Context) {
 	testMessage := c.Query("msg")
 
-	responseText, err := cc.AIService.GenerateResponse([]services.ChatMessage{
-		{Role: "user", Content: testMessage},
-	})
+	responseText, err := cc.AIService.GenerateResponse(
+		c.Request.Context(),
+		[]services.ChatMessage{{
+			Role:    "user",
+			Content: testMessage,
+		}})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "AI服务错误: " + err.Error()})
 		return
@@ -82,7 +85,7 @@ func (cc *ChatController) Chat(c *gin.Context) {
 	}
 
 	// 调用AI服务
-	responseText, err := cc.AIService.GenerateResponse(openAIMessages)
+	responseText, err := cc.AIService.GenerateResponse(c.Request.Context(), openAIMessages)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "AI服务错误: " + err.Error()})
 		return
@@ -193,7 +196,7 @@ func (cc *ChatController) StreamChat(c *gin.Context) {
 	}
 
 	// 调用AI服务的流式响应方法
-	err := cc.AIService.GenerateStreamResponse(openAIMessages, callback)
+	err := cc.AIService.GenerateStreamResponse(c.Request.Context(), openAIMessages, callback)
 	if err != nil {
 		// 尝试发送错误消息，但此时可能连接已关闭
 		c.Writer.Write([]byte("data: {\"error\": \"" + err.Error() + "\"}\n\n"))

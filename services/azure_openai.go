@@ -81,14 +81,14 @@ func (s *AIService) convertToAzureMessages(messages []ChatMessage) ([]azopenai.C
 	return azMessages, nil
 }
 
-func (s *AIService) GenerateResponse(messages []ChatMessage) (string, error) {
+func (s *AIService) GenerateResponse(ctx context.Context, messages []ChatMessage) (string, error) {
 	// 将我们的消息格式转换为 Azure SDK 的消息格式
 	azMessages, err := s.convertToAzureMessages(messages)
 	if err != nil {
 		return "", err
 	}
 
-	resp, err := s.client.GetChatCompletions(context.TODO(), azopenai.ChatCompletionsOptions{
+	resp, err := s.client.GetChatCompletions(ctx, azopenai.ChatCompletionsOptions{
 		Messages:         azMessages,
 		DeploymentName:   &s.deploymentName,
 		MaxTokens:        &s.maxTokens,
@@ -110,7 +110,11 @@ func (s *AIService) GenerateResponse(messages []ChatMessage) (string, error) {
 	return *resp.Choices[0].Message.Content, nil
 }
 
-func (s *AIService) GenerateStreamResponse(messages []ChatMessage, callback func(chunk string)) error {
+func (s *AIService) GenerateStreamResponse(
+	ctx context.Context,
+	messages []ChatMessage,
+	callback func(chunk string),
+) error {
 	// 将我们的消息格式转换为 Azure SDK 的消息格式
 	azMessages, err := s.convertToAzureMessages(messages)
 	if err != nil {
@@ -119,7 +123,7 @@ func (s *AIService) GenerateStreamResponse(messages []ChatMessage, callback func
 
 	// 创建流式请求
 	streamResp, err := s.client.GetChatCompletionsStream(
-		context.TODO(),
+		ctx,
 		azopenai.ChatCompletionsStreamOptions{
 			Messages:         azMessages,
 			DeploymentName:   &s.deploymentName,
