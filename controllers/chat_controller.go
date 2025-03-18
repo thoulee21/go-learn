@@ -15,13 +15,13 @@ type ChatController struct {
 	AIService *services.AIService
 }
 
-// @Summary 测试AI服务
-// @Description 测试AI服务是否正常工作
-// @Produce json
-// @Param msg query string false "测试消息"
-// @Success 200 {string} string "成功"
-// @Failure 500 {object} string "内部错误"
-// @Router /chat/test [get]
+//	@Summary		测试AI服务
+//	@Description	测试AI服务是否正常工作
+//	@Produce		json
+//	@Param			msg	query		string	false	"测试消息"
+//	@Success		200	{string}	string	"成功"
+//	@Failure		500	{object}	string	"内部错误"
+//	@Router			/chat/test [get]
 func (cc *ChatController) Test(c *gin.Context) {
 	testMessage := c.Query("msg")
 
@@ -39,15 +39,15 @@ func (cc *ChatController) Test(c *gin.Context) {
 	c.JSON(http.StatusOK, responseText)
 }
 
-// @Summary 发送聊天消息
-// @Description 发送消息到AI并获取回复
-// @Accept json
-// @Produce json
-// @Param request body models.ChatRequest true "聊天请求"
-// @Success 200 {object} models.ChatResponse "成功"
-// @Failure 400 {object} string "请求错误"
-// @Failure 500 {object} string "内部错误"
-// @Router /chat [post]
+//	@Summary		发送聊天消息
+//	@Description	发送消息到AI并获取回复
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		models.ChatRequest	true	"聊天请求"
+//	@Success		200		{object}	models.ChatResponse	"成功"
+//	@Failure		400		{object}	string				"请求错误"
+//	@Failure		500		{object}	string				"内部错误"
+//	@Router			/chat [post]
 func (cc *ChatController) Chat(c *gin.Context) {
 	var request models.ChatRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -109,14 +109,14 @@ func (cc *ChatController) Chat(c *gin.Context) {
 	})
 }
 
-// @Summary 获取聊天历史
-// @Description 获取特定会话的聊天历史
-// @Produce json
-// @Param session_id path string true "会话ID"
-// @Success 200 {array} models.ChatMessage "成功"
-// @Failure 400 {object} string "请求错误"
-// @Failure 500 {object} string "内部错误"
-// @Router /chat/history/{session_id} [get]
+//	@Summary		获取聊天历史
+//	@Description	获取特定会话的聊天历史
+//	@Produce		json
+//	@Param			session_id	path		string				true	"会话ID"
+//	@Success		200			{array}		models.ChatMessage	"成功"
+//	@Failure		400			{object}	string				"请求错误"
+//	@Failure		500			{object}	string				"内部错误"
+//	@Router			/chat/history/{session_id} [get]
 func (cc *ChatController) GetChatHistory(c *gin.Context) {
 	sessionID := c.Param("session_id")
 	if sessionID == "" {
@@ -133,15 +133,15 @@ func (cc *ChatController) GetChatHistory(c *gin.Context) {
 	c.JSON(http.StatusOK, messages)
 }
 
-// @Summary 流式发送聊天消息
-// @Description 流式发送消息到AI并获取实时回复
-// @Accept json
-// @Produce text/event-stream
-// @Param request body models.ChatRequest true "聊天请求"
-// @Success 200 {object} string "成功"
-// @Failure 400 {object} string "请求错误"
-// @Failure 500 {object} string "内部错误"
-// @Router /chat/stream [post]
+//	@Summary		流式发送聊天消息
+//	@Description	流式发送消息到AI并获取实时回复
+//	@Accept			json
+//	@Produce		text/event-stream
+//	@Param			request	body		models.ChatRequest	true	"聊天请求"
+//	@Success		200		{object}	string				"成功"
+//	@Failure		400		{object}	string				"请求错误"
+//	@Failure		500		{object}	string				"内部错误"
+//	@Router			/chat/stream [post]
 func (cc *ChatController) StreamChat(c *gin.Context) {
 	var request models.ChatRequest
 	if err := c.ShouldBindJSON(&request); err != nil {
