@@ -5,12 +5,14 @@ import (
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/thoulee21/go-learn/controllers"
 	_ "github.com/thoulee21/go-learn/docs"
+	"github.com/thoulee21/go-learn/middlewares"
 	"github.com/thoulee21/go-learn/models"
 	"github.com/thoulee21/go-learn/routes"
 	"github.com/thoulee21/go-learn/services"
@@ -59,6 +61,11 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("Failed to initialize AI service: %v", err))
 	}
+
+	r.Use(cors.Default())
+	r.Use(middlewares.ErrorHandler())
+	r.Use(middlewares.GinBodyLogMiddleware)
+	r.Use(middlewares.CommonHeaders)
 
 	chatController := &controllers.ChatController{DB: db, AIService: aiService}
 	routes.SetupChatRoutes(r, chatController)
