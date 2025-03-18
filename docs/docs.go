@@ -142,7 +142,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/chat/test": {
+        "/test": {
             "get": {
                 "description": "测试AI服务是否正常工作",
                 "produces": [

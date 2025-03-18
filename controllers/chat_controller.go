@@ -21,7 +21,7 @@ type ChatController struct {
 //	@Param			msg	query		string	false	"测试消息"
 //	@Success		200	{string}	string	"成功"
 //	@Failure		500	{object}	string	"内部错误"
-//	@Router			/chat/test [get]
+//	@Router			/test [get]
 func (cc *ChatController) Test(c *gin.Context) {
 	testMessage := c.Query("msg")
 
