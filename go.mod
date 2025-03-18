@@ -5,7 +5,6 @@ go 1.24.0
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai v0.7.2
 	github.com/gin-contrib/cors v1.7.4
-	github.com/golang-jwt/jwt/v4 v4.5.1
 	gorm.io/driver/mysql v1.5.7
 )
 
