@@ -33,7 +33,7 @@ func GinBodyLogMiddleware(c *gin.Context) {
 
 	c.Next()
 
-	loc, _ := time.LoadLocation("America/Mexico_City")
+	loc, _ := time.LoadLocation("Asia/Shanghai")
 	allDataIO := map[string]any{
 		"ruta":          c.FullPath(),
 		"request_uri":   c.Request.RequestURI,
