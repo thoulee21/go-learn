@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"bytes"
-	"fmt"
 	"io"
+	"log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +26,7 @@ func GinBodyLogMiddleware(c *gin.Context) {
 	buf := make([]byte, 4096)
 	num, err := c.Request.Body.Read(buf)
 	if err != nil && err.Error() != "EOF" {
-		_ = fmt.Errorf("error reading buffer: %s", err.Error())
+		log.Fatalf("error reading buffer: %s", err.Error())
 	}
 	reqBody := string(buf[0:num])
 	c.Request.Body = io.NopCloser(bytes.NewBuffer([]byte(reqBody)))
@@ -43,5 +43,5 @@ func GinBodyLogMiddleware(c *gin.Context) {
 		"errors":        c.Errors.Errors(),
 		"created_at":    time.Now().In(loc).Format("2006-01-02T15:04:05"),
 	}
-	_ = fmt.Sprintf("%v", allDataIO)
+	log.Printf("%v", allDataIO)
 }
