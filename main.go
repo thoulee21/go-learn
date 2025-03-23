@@ -11,6 +11,7 @@ import (
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/thoulee21/go-learn/controllers"
+	"github.com/thoulee21/go-learn/controllers/user"
 	_ "github.com/thoulee21/go-learn/docs"
 	"github.com/thoulee21/go-learn/middlewares"
 	"github.com/thoulee21/go-learn/models"
@@ -48,7 +49,7 @@ func init() {
 		panic("failed to connect database")
 	}
 
-	dbErr := db.AutoMigrate(&models.ChatMessage{})
+	dbErr := db.AutoMigrate(&models.ChatMessage{}, models.User{})
 	if dbErr != nil {
 		panic("failed to migrate database")
 	}
@@ -62,13 +63,21 @@ func main() {
 		panic(fmt.Sprintf("Failed to initialize AI service: %v", err))
 	}
 
+	userService, err := services.NewUserService(db)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to initialize User service: %v", err))
+	}
+
 	r.Use(cors.Default())
 	r.Use(middlewares.ErrorHandler())
 	r.Use(middlewares.GinBodyLogMiddleware)
 	r.Use(middlewares.CommonHeaders)
 
 	chatController := &controllers.ChatController{DB: db, AIService: aiService}
+	userController := &user.UserController{DB: db, UserService: userService}
+
 	routes.SetupChatRoutes(r, chatController)
+	routes.SetupUserRoutes(r, userController)
 
 	// Swagger 文档
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
