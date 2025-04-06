@@ -18,6 +18,7 @@ import (
 	"github.com/thoulee21/go-learn/routes"
 	"github.com/thoulee21/go-learn/services"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -46,7 +47,13 @@ func init() {
 	var err error
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		panic("failed to connect database")
+		// 如果连接MySQL失败，则使用SQLite数据库
+		log.Println("Failed to connect to MySQL, falling back to SQLite")
+		db, err = gorm.Open(sqlite.Open("sqlite.db"), &gorm.Config{})
+		if err != nil {
+			panic("failed to connect to database")
+		}
+		log.Println("Using SQLite database")
 	}
 
 	dbErr := db.AutoMigrate(&models.ChatMessage{}, models.User{})

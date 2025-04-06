@@ -6,11 +6,13 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/ai/azopenai v0.7.2
 	github.com/gin-contrib/cors v1.7.4
 	gorm.io/driver/mysql v1.5.7
+	gorm.io/driver/sqlite v1.5.7
 )
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/go-sql-driver/mysql v1.9.0 // indirect
+	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 )
 
 require (
